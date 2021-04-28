@@ -4,7 +4,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Prop, Provide, Vue } from 'vue-property-decorator'
+import { Component, Provide, Vue } from 'vue-property-decorator'
 
 @Component({ name: 'ApplicationContext' })
 export default class ApplicationContext extends Vue {

@@ -5,7 +5,7 @@ import File from './File';
 export default class Directory {
   /** 应用名称 */
   @JsonProperty('name', String, true)
-  public name = '应用';
+  public name = '/';
 
   public children: (Directory | File)[] =[]
 }

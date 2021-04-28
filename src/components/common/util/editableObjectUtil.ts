@@ -1,9 +1,9 @@
-import ObjectEditor from '@/components/object-editor/ObjectEditor.vue'
+import ObjectEditor from '@/components/application-editor/object-editor/ObjectEditor.vue'
 import EditableObject from '@/core/editable-object/EditableObject'
 import VueFileEO from '@/core/editable-object/vue-file/VueFileEO'
 
 import { VueConstructor } from 'vue'
-import PageConfigEditor from '@/components/object-editor/PageConfigEditor.vue'
+import PageConfigEditor from '@/components/application-editor/object-editor/PageConfigEditor.vue'
 
 // eslint-disable-next-line
 type Constructor<T> = new(...args: any[]) => T;
