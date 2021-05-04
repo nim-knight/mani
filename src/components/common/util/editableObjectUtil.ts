@@ -1,15 +1,17 @@
-import ObjectEditor from '@/components/application-editor/object-editor/ObjectEditor.vue'
+import ObjectEditor from '@/components/application-editor/object-editor/FileEditor.vue'
 import EditableObject from '@/core/editable-object/EditableObject'
-import VueFileEO from '@/core/editable-object/vue-file/VueFileEO'
+import FileEditableObject from '@/core/editable-object/file-editable-object/FileEditableObject'
 
 import { VueConstructor } from 'vue'
-import PageConfigEditor from '@/components/application-editor/object-editor/PageConfigEditor.vue'
+import FileEditor from '@/components/application-editor/object-editor/FileEditor.vue'
+import VueFileEditor from '@/components/application-editor/object-editor/VueFileEditor.vue'
 
 // eslint-disable-next-line
 type Constructor<T> = new(...args: any[]) => T;
 interface EditableObjectTypeInfo {
   name: string;
   constructor: Constructor<EditableObject>;
+  fileSuffix?: string;
   editors: VueConstructor[];
   icon: string[];
   color: string;
@@ -19,25 +21,36 @@ interface EditableObjectTypeInfo {
 
 export const editableObjectTypeInfos: EditableObjectTypeInfo[] = [
   {
-    name: '页面（pages）',
-    constructor: VueFileEO,
-    editors: [PageConfigEditor],
+    name: 'Vue文件',
+    constructor: FileEditableObject,
+    editors: [VueFileEditor],
+    fileSuffix: 'vue',
+    icon: ['fab', 'vuejs'],
+    color: '#3fb884',
+    getChildren: applicationConfig => applicationConfig.pageConfigs
+  },
+  {
+    name: '文件',
+    constructor: FileEditableObject,
+    editors: [FileEditor],
     icon: ['far', 'file'],
-    color: '#cd853f',
+    color: '#ff6600',
     getChildren: applicationConfig => applicationConfig.pageConfigs
   }
 ]
 
 export function getEditableObjectTypeInfo (editableObject: EditableObject) {
   const find = editableObjectTypeInfos.find((editableObjectTypeInfo) => {
-    return editableObject instanceof editableObjectTypeInfo.constructor
+    const constructorMatch = editableObject instanceof editableObjectTypeInfo.constructor
+    const fileSuffixMatch = editableObjectTypeInfo.fileSuffix ?
+      (editableObject.displayName.endsWith(editableObjectTypeInfo.fileSuffix)) :
+      true
+    return constructorMatch && fileSuffixMatch
   })
   return find;
 }
 
 export function getDefaultEditor (editableObject: EditableObject) {
-  const find = editableObjectTypeInfos.find((editableObjectTypeInfo) => {
-    return editableObject instanceof editableObjectTypeInfo.constructor
-  })
+  const find = getEditableObjectTypeInfo(editableObject)
   return find?.editors[0] || ObjectEditor;
 }

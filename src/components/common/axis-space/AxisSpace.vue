@@ -383,8 +383,6 @@ $axisWidth: 25px;
     bottom: 0;
     overflow: hidden;
     background: $panel-background-color-darken;
-    border-right: solid 5px $panel-background-color;
-    border-bottom: solid 5px $panel-background-color;
   }
 
   .unscale-layer {

@@ -32,18 +32,22 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Inject } from 'vue-property-decorator'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import Jszip from 'jszip'
 import Project from '@/core/model/Project'
 import Directory from '@/core/model/Directory'
 import File from '@/core/model/File'
+import ApplicationEditor from '@/components/application-editor/ApplicationEditor.vue'
 
 @Component({
   name: 'ApplicationEditorHeader',
   components: { FontAwesomeIcon }
 })
 export default class ApplicationEditorHeader extends Vue {
+  @Inject('app-editor')
+  public appEditor!: ApplicationEditor
+
   private uploadFile() {
     const fileInput = this.$refs.fileInput as HTMLInputElement
     fileInput.value = ''
@@ -77,9 +81,9 @@ export default class ApplicationEditorHeader extends Vue {
               if (!parentDirectory) {
                 debugger
               }
-              parentDirectory.children.push(dir)
+              parentDirectory.directorys.push(dir)
             } else {
-              project.rootDirectory.children.push(dir)
+              project.rootDirectory.directorys.push(dir)
             }
           } else {
             const content = await file.async('string')
@@ -91,16 +95,16 @@ export default class ApplicationEditorHeader extends Vue {
               const name = array[array.length - 1]
               const parentPath = array.slice(0, -1).join('/')
               const parentDirectory = dirs[parentPath]
-              newFile.fileName = name
-              parentDirectory.children.push(newFile)
+              newFile.name = name
+              parentDirectory.files.push(newFile)
             } else {
               const name = key
-              newFile.fileName = name
-              project.rootDirectory.children.push(newFile)
+              newFile.name = name
+              project.rootDirectory.files.push(newFile)
             }
           }
         }
-        console.log(project)
+        this.appEditor.openProject(project)
       } catch (error) {
         console.log(error)
       }

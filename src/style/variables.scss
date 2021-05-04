@@ -2,9 +2,10 @@ $header-height: 32px;
 $panel-header-height: 24px;
 
 $primary-color: #007aff;
+$primary-color-lighten: lighten($primary-color, 15%);
 
 $text-color: #ffffff;
-$text-color-gray: #888888;
+$text-color-gray: #a0a0a0;
 $background-color: #262626;
 
 $panel-background-color: #323232;

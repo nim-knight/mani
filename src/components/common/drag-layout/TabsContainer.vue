@@ -16,12 +16,14 @@
       >{{child.label}}</div>
     </div>
     <div class="body">
-      <CrossRenderView
-        v-for="(child, index) in children"
-        v-show="activeIndex === index"
-        :key="index"
-        :name="child.name"
-      ></CrossRenderView>
+      <div class="inner-body">
+        <CrossRenderView
+          v-for="(child, index) in children"
+          v-show="activeIndex === index"
+          :key="index"
+          :name="child.name"
+        ></CrossRenderView>
+      </div>
     </div>
     <div class="mask"
       v-show="isDraging"
@@ -265,7 +267,6 @@ export default class TabsContainer extends DragContainer {
   }
 
   .tabs {
-    width: 100%;
     height: $panel-header-height;
     border-left: solid 1px $border-color;
     border-right: solid 1px $border-color;
@@ -299,13 +300,20 @@ export default class TabsContainer extends DragContainer {
   }
 
   .body {
-    height: calc(100% - #{$panel-header-height + 12px});
+    height: calc(100% - #{$panel-header-height + 6px});
     border-left: solid 1px $border-color;
     border-right: solid 1px $border-color;
     border-bottom: solid 1px $border-color;
     background: $panel-background-color;
     box-shadow: 0px -1px 0px 0px $border-color;
-    padding: 5px;
+    padding: 2px;
+  }
+
+  .inner-body {
+    background: $panel-background-color-darken;
+    padding: 3px 8px;
+    height: calc(100% - 6px);
+    overflow: hidden;
   }
 }
 </style>

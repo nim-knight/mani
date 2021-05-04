@@ -12,11 +12,15 @@ import codemirror from 'codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/material-darker.css'
 import 'codemirror/mode/vue/vue.js'
+import 'codemirror/mode/javascript/javascript'
 
 @Component
 export default class CodeEditor extends Vue {
   @Prop()
-  private value!: string
+  public value!: string
+
+  @Prop({ default: 'javascript' })
+  public mode!: string
 
   private cminstance!: codemirror.EditorFromTextArea;
 
@@ -34,7 +38,7 @@ export default class CodeEditor extends Vue {
     this.cminstance  = codemirror.fromTextArea(this.$refs.textarea as HTMLTextAreaElement, {
       theme: 'material-darker',
       lineNumbers: true,
-      mode: 'vue'
+      mode: this.mode
     })
     this.cminstance.setValue(this.value)
     this.cminstance.on('change', () => {

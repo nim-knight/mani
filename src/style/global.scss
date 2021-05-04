@@ -2,6 +2,9 @@
 
  /* 滚动条 */
 .ApplicationEditor {
+  * {
+    user-select: none;
+  }
   *::-webkit-scrollbar {
     display: block;
     width: 2px;

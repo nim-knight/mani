@@ -7,5 +7,9 @@ export default class Directory {
   @JsonProperty('name', String, true)
   public name = '/';
 
-  public children: (Directory | File)[] =[]
+  @JsonProperty('directorys', [Directory], true)
+  public directorys: Directory[] =[]
+
+  @JsonProperty('files', [File], true)
+  public files: File[] =[]
 }

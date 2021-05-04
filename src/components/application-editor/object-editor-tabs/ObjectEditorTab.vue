@@ -44,7 +44,7 @@ export default class ObjectEditorTab extends Vue {
   }
 
   private get objectName() {
-    return this.object.name;
+    return this.object.displayName;
   }
 
   private get editableObjectTypeInfo() {

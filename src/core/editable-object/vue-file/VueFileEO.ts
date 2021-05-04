@@ -18,9 +18,9 @@ export default class VueFileEO extends EditableObject {
 
   constructor (file: File, directoryPath: string) {
     super()
-    this.name = file.fileName
+    this.name = file.name
     this.file = file
-    this.path = directoryPath + file.fileName
+    this.path = directoryPath + file.name
     this.VueFileHandler = new VueFileHandler({ propsData: { file: this.file }})
   }
 }

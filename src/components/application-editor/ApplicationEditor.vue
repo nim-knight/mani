@@ -1,5 +1,5 @@
 <template>
-  <div class="ApplicationEditor" @wheel.ctrl.prevent.stop>
+  <div class="ApplicationEditor" @wheel.ctrl.prevent.stop @contextmenu.prevent>
     <ApplicationEditorHeader></ApplicationEditorHeader>
     <div class="body">
       <!-- <ApplicationEditorSidebar class="sidebar"></ApplicationEditorSidebar> -->
@@ -10,7 +10,7 @@
             ref="objectEditorTabs"
             @change="handelObjectEditorTabsChange"
           ></ObjectEditorTabs>
-          <div name="test-1"></div>
+          <FileExplorer name="test-1"/>
           <div name="test-2">test-2</div>
           <PropertiesConfigPanel name="test-3"/>
           <div name="test-4">test-4</div>
@@ -18,23 +18,30 @@
         </DragLayoutContext>
       </div>
     </div>
+    <ApplicationEditorMenu ref="menu"></ApplicationEditorMenu>
   </div>
 </template>
 <script lang="ts">
 import { VueConstructor } from 'vue/types/vue'
-import { Component, Provide, Ref, Vue } from 'vue-property-decorator'
+import { Component, Provide, Ref, Vue, Watch } from 'vue-property-decorator'
 import { LayoutNode } from '@/components/common/drag-layout/DragLayoutInterface'
+import { JsonConvert } from '@/core/json2typescript/json-convert'
 import EditableObject from '@/core/editable-object/EditableObject'
 import defaultLayout from './default-layout'
 
 import ApplicationEditorHeader from './ApplicationEditorHeader.vue'
 import DragLayoutContext from '@/components/common/drag-layout/DragLayoutContext.vue'
 import ObjectEditorTabs from './object-editor-tabs/ObjectEditorTabs.vue'
-import PropertiesConfigPanel from '@/components/tool-panel/properties-config-panel/PropertiesConfigPanel.vue'
+import FileExplorer from './tool-panel/file-explorer/FileExplorer.vue'
+import PropertiesConfigPanel from './tool-panel/properties-config-panel/PropertiesConfigPanel.vue'
+import { default as ApplicationEditorMenu, MeunItem} from './ApplicationEditorMenu.vue'
 
 import Project from '@/core/model/Project'
+import Directory from '@/core/model/Directory'
 import File from '@/core/model/File'
-import VueFileEO from '@/core/editable-object/vue-file/VueFileEO'
+
+import localforage from 'localforage'
+import throttle from 'lodash.throttle'
 
 @Component({
   name: 'ApplicationEditor',
@@ -42,12 +49,17 @@ import VueFileEO from '@/core/editable-object/vue-file/VueFileEO'
     ApplicationEditorHeader,
     DragLayoutContext,
     ObjectEditorTabs,
-    PropertiesConfigPanel
+    PropertiesConfigPanel,
+    FileExplorer,
+    ApplicationEditorMenu
   }
 })
 export default class ApplicationEditor extends Vue {
   @Ref()
   public objectEditorTabs!: ObjectEditorTabs
+
+  @Ref()
+  public menu!: ApplicationEditorMenu
 
   @Provide('app-editor')
   public get appEditor (): ApplicationEditor { return this }
@@ -59,6 +71,24 @@ export default class ApplicationEditor extends Vue {
 
   private layoutRootNode: LayoutNode = defaultLayout
 
+  private get projectFiles() {
+    const projectFiles: File[] = []
+    const  traverse = (directory: Directory) => {
+      if (directory) {
+        for (const subDirectory of directory.directorys) {
+          traverse(subDirectory)
+        }
+        for (const file of directory.files) {
+          projectFiles.push(file)
+        }
+      }
+    }
+    if (this.project) {
+      traverse(this.project.rootDirectory)
+    }
+    return projectFiles
+  }
+
   public openObjectEditor(
     object: EditableObject,
     editor?: VueConstructor | undefined | null,
@@ -67,46 +97,34 @@ export default class ApplicationEditor extends Vue {
     return this.objectEditorTabs.openObjectEditor(object, editor, isPreview)
   }
 
+  public openProject(project: Project) {
+    this.project = project
+    localforage.setItem('mani-project', this.project)
+  }
+
+  public openContextmenu(event: MouseEvent, meunItems: MeunItem[]) {
+    this.menu.openContextmenu(event.clientX, event.clientY, meunItems)
+  }
+
+  @Watch('project', { deep: true })
+  private projectChange(project: Project) {
+    this.saveChange(project)
+  }
+
+  private saveChange = throttle((project) => {
+    this.project && localforage.setItem('mani-project', project)
+  }, 100)
+
   /* 事件处理 */
   private handelObjectEditorTabsChange(object: EditableObject| null) {
     this.currentEditableObject = object
   }
 
-  private mounted () {
-    const file = new File()
-    file.fileName = 'app.vue'
-    file.content = `<template>
-  <PageContainer 
-    :width="1920"
-    :height="1080"
-    :bgColor="#444444"
-  >
-    <Widget name="test1"/>
-    <Widget name="test2"/>
-    <Widget name="test3"/>
-  </PageContainer>
-</template>
-
-<script>
-export default {
-  data () {
-    return {
-      greeting: "Hello"
-    };
-  }
-};
-<` + `/script>
-
-<style scoped>
-p {
-  font-size: 2em;
-  text-align: center;
-}
-</style>
-`
-    const vueFileEO = new VueFileEO(file, '')
-    console.log(vueFileEO.VueFileHandler.ast)
-    this.openObjectEditor(vueFileEO)
+  private async mounted () {
+    const projectPlainObject = await localforage.getItem('mani-project')
+    if (projectPlainObject) {
+      this.project = new JsonConvert().deserializeObject(projectPlainObject, Project)
+    }
   }
 }
 </script>

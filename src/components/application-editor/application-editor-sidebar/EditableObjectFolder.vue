@@ -100,7 +100,7 @@ export default class EditableObjectFolder extends Vue {
   private createNewObj() {
     const Constructor = this.typeInfo.constructor
     const newObj = new Constructor()
-    newObj.name += this.children.length + 1
+    // newObj.name += this.children.length + 1
     this.children.push(newObj)
     this.appEditor.openObjectEditor(newObj)
   }

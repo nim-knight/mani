@@ -11,5 +11,6 @@ export default class Project {
   @JsonProperty('name', String, true)
   public name = '应用';
 
+  @JsonProperty('rootDirectory', Directory, true)
   public rootDirectory: Directory = new Directory()
 }
