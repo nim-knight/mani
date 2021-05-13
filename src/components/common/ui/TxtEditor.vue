@@ -13,6 +13,7 @@
       v-model="innerValue"
       @blur="inputValue"
       @keypress.enter="inputValue"
+      @keypress.esc="inputValue"
       @keydown.stop
     >
     <font-awesome-icon
@@ -110,6 +111,7 @@ export default class TxtEditor extends Vue {
     font-size: inherit;
     line-height: inherit;
     padding: 0;
+    font-family: initial;
   }
 }
 </style>

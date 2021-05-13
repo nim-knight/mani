@@ -15,35 +15,36 @@
         <input type="color" v-model="pageConfig.bgColor">
       </div>
     </div>
-    <div>
-      {{widgetConfigs}}
-    </div>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Inject } from 'vue-property-decorator'
 import ApplicationEditor from '@/components/application-editor/ApplicationEditor.vue'
-import VueFileEO from '@/core/editable-object/vue-file/VueFileEO'
+import FileEditableObject from '@/core/editable-object/file-editable-object/FileEditableObject'
 
 @Component
 export default class PropertiesConfigPanel extends Vue {
   @Inject('app-editor')
   public appEditor!: ApplicationEditor
 
-  private get vueFileEO() {
+  private get fileEditableObject() {
     const currentEditableObject = this.appEditor.currentEditableObject
-    if (currentEditableObject instanceof VueFileEO) {
+    if (currentEditableObject instanceof FileEditableObject) {
       return currentEditableObject
     }
     return null
   }
-
-  private get pageConfig() {
-    return this.vueFileEO?.VueFileHandler.pageConfig
+  
+  private get file() {
+    return this.fileEditableObject?.file
   }
 
-  private get widgetConfigs() {
-    return this.vueFileEO?.VueFileHandler.widgetConfigs
+  private get fileHandler() {
+    return this.fileEditableObject?.fileHandler
+  }
+
+  private get pageConfig() {
+    return this.fileHandler?.pageConfig
   }
 }
 </script>

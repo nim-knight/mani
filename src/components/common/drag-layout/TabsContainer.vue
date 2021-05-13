@@ -1,3 +1,4 @@
+
 <template>
   <div
     class="TabsContainer"
@@ -300,7 +301,7 @@ export default class TabsContainer extends DragContainer {
   }
 
   .body {
-    height: calc(100% - #{$panel-header-height + 6px});
+    height: calc(100% - #{$panel-header-height});
     border-left: solid 1px $border-color;
     border-right: solid 1px $border-color;
     border-bottom: solid 1px $border-color;
@@ -312,7 +313,7 @@ export default class TabsContainer extends DragContainer {
   .inner-body {
     background: $panel-background-color-darken;
     padding: 3px 8px;
-    height: calc(100% - 6px);
+    height: 100%;
     overflow: hidden;
   }
 }

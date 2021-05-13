@@ -199,7 +199,7 @@ export default class ObjectEditorTabs extends Vue {
     border-right: solid 1px $border-color;
   }
   .editor-container {
-    height: calc(100% - #{$panel-header-height + 1px});
+    height: calc(100% - #{$panel-header-height});
     background: $panel-background-color;
     border-left: solid 1px $border-color;
     border-right: solid 1px $border-color;

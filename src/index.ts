@@ -14,7 +14,7 @@ import {
   faPen
 } from '@fortawesome/free-solid-svg-icons'
 
-import { faFile } from '@fortawesome/free-regular-svg-icons'
+import { faFile, faFileImage } from '@fortawesome/free-regular-svg-icons'
 import { faVuejs } from '@fortawesome/free-brands-svg-icons'
 
 library.add(faMagic)
@@ -31,5 +31,6 @@ library.add(faVuejs)
 library.add(faChevronCircleRight)
 library.add(faChevronCircleDown)
 library.add(faPen)
+library.add(faFileImage)
 
 export { default as ApplicationEditor } from '@/components/application-editor/ApplicationEditor.vue'

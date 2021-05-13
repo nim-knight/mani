@@ -2,6 +2,7 @@
   <div class="VueFileEditor">
     <div class="body">
       <AxisSpace class="axis-space">
+        <PagePreviewer v-if="pageConfig" :pageConfig="pageConfig"></PagePreviewer>
       </AxisSpace>
       <div class="code-tool-bar">
         <font-awesome-icon
@@ -19,21 +20,27 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Inject, Prop, Vue } from 'vue-property-decorator'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import TabInfo from '@/components/application-editor/object-editor-tabs/TabInfo';
 import FileEditableObject from '@/core/editable-object/file-editable-object/FileEditableObject';
 import CodeEditor from '@/components/common/code-editor/CodeEditor.vue'
 import AxisSpace from '@/components/common/axis-space/AxisSpace.vue'
+import PagePreviewer from '@/components/common/previewer/PagePreviewer.vue'
+import ApplicationEditor from '../ApplicationEditor.vue';
 
 @Component({
   components: {
     AxisSpace,
     CodeEditor,
-    FontAwesomeIcon
+    FontAwesomeIcon,
+    PagePreviewer
   }
 })
 export default class VueFileEditor extends Vue {
+  @Inject('app-editor')
+  public appEditor!: ApplicationEditor
+
   @Prop({ required: true })
   protected tabInfo!: TabInfo;
 
@@ -43,6 +50,10 @@ export default class VueFileEditor extends Vue {
 
   public get file() {
     return this.fileEditableObject.file
+  }
+
+  private get pageConfig() {
+    return this.fileEditableObject.fileHandler.pageConfig
   }
 
   public get content() {

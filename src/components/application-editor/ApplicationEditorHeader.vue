@@ -35,9 +35,9 @@
 import { Component, Vue, Inject } from 'vue-property-decorator'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import Jszip from 'jszip'
-import Project from '@/core/model/Project'
-import Directory from '@/core/model/Directory'
-import File from '@/core/model/File'
+import Project from '@/core/file-model/Project'
+import Directory from '@/core/file-model/Directory'
+import File from '@/core/file-model/File'
 import ApplicationEditor from '@/components/application-editor/ApplicationEditor.vue'
 
 @Component({
@@ -87,9 +87,11 @@ export default class ApplicationEditorHeader extends Vue {
             }
           } else {
             const content = await file.async('string')
+            const base64 = await file.async('base64')
             const array = key.split('/')
             const newFile = new File()
             newFile.content = content
+            newFile.base64 = base64
             if (array && array.length > 1) {
               console.log(array)
               const name = array[array.length - 1]

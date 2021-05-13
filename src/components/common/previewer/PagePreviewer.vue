@@ -9,8 +9,8 @@
   >{{pageConfig}}</div>
 </template>
 <script lang="ts">
+import PageConfig from '@/core/model/PageContainer';
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import PageConfig from '@/core/editable-object/vue-file/PageContainer';
 @Component
 export default class VueFilePreviewer extends Vue {
   @Prop()

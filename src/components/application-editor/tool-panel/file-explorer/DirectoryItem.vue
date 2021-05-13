@@ -1,6 +1,7 @@
 <template>
   <div
     class="DirectoryItem"
+    :class="{ root }"
     @contextmenu.stop.prevent="handleContextmenu"
   >
     <div class="directory"
@@ -16,48 +17,29 @@
         class="icon expanded"
         :icon="expanded ? ['fas', 'folder-open'] : ['fas', 'folder']"
       />
-      <span class="name">{{directory.name}}</span>
+      <!-- <span class="name">{{directory.name}}</span> -->
+      <NameEditor
+        class="name"
+        ref="nameEditor"
+        v-model="directory.name"
+      ></NameEditor>
     </div>
-    <div :class="root ? '' : 'children'" v-if="expanded || root">
-      <div class="new" v-if="newInfo.show && newInfo.type === 'directory'">
-        <font-awesome-icon
-          class="arrow-icon"
-          :icon="['fas', 'chevron-right']"
-        />
-        <font-awesome-icon
-          class="icon"
-          :icon="['fas', 'folder']"
-        />
-        <input
-          type="text"
-          ref="newInput"
-          v-model="newInfo.name"
-          @blur="handleCreateNew"
-          @keydown.esc="handleCreateNew"
-          @keydown.enter="handleCreateNew"
-        >
-      </div>
+    <div
+      v-if="expanded || root"
+      :class="root ? '' : 'children'"
+      @contextmenu.stop.prevent
+    >
+      <CreateNew :isDirectory="true" ref="directoryCreateNew"/>
       <DirectoryItem
         v-for="item in directorys"
+        :selected="selected"
         :directory="item"
         :key="item.name"
       ></DirectoryItem>
-      <div class="new" v-if="newInfo.show && newInfo.type === 'file'">
-        <font-awesome-icon
-          class="file-icon"
-          :icon="['far', 'file']"
-        />
-        <input
-          type="text"
-          ref="newInput"
-          v-model="newInfo.name"
-          @blur="handleCreateNew"
-          @keydown.esc="handleCreateNew"
-          @keydown.enter="handleCreateNew"
-        >
-      </div>
+      <CreateNew ref="fileCreateNew" />
       <FileItem
         v-for="item in files"
+        :selected="selected"
         :file="item"
         :key="item.name"
       ></FileItem>
@@ -67,30 +49,34 @@
 <script lang="ts">
 import { Component, Prop, Vue, Inject, Ref } from 'vue-property-decorator'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { MessageBox } from 'element-ui'
 import ApplicationEditor from '@/components/application-editor/ApplicationEditor.vue'
-import Directory from '@/core/model/Directory'
-import File from '@/core/model/File'
+import Directory from '@/core/file-model/Directory'
 import FileItem from './FileItem.vue'
+import NameEditor from './NameEditor.vue'
+import CreateNew from './CreateNew.vue'
 
 @Component({
   name: 'DirectoryItem',
   components: {
     FontAwesomeIcon,
-    FileItem
+    FileItem,
+    NameEditor,
+    CreateNew
   }
 })
 export default class DirectoryItem extends Vue {
   @Inject('app-editor')
   public appEditor!: ApplicationEditor
 
-  @Prop()
-  private directory!: Directory
+  @Ref()
+  private nameEditor!: NameEditor
 
-  private newInfo = {
-    type: 'directory',
-    show: false,
-    name: ''
-  }
+  @Prop()
+  public directory!: Directory
+
+  @Prop()
+  private selected!: (Directory|File)[]
 
   @Prop({
     required: false,
@@ -98,7 +84,17 @@ export default class DirectoryItem extends Vue {
   })
   private root!: boolean
 
-  public expanded = false;
+  private expanded = false;
+
+  public get siblings() {
+    if (this.$parent instanceof DirectoryItem) {
+      const directorys = this.$parent.directory.directorys
+      const files = this.$parent.directory.files
+
+      return [...directorys.filter(d => d !== this.directory), ...files]
+    }
+    return []
+  }
 
   private get directorys() {
     return this.directory.directorys
@@ -109,13 +105,12 @@ export default class DirectoryItem extends Vue {
   }
 
   private handleContextmenu(event: MouseEvent) {
-    this.appEditor.openContextmenu(event, [
-      {
+    const meunItems = [{
         name: '新建文件',
-        handler: () => { this.openNewInput('file') }
+        handler: () => { this.openCrfeateNew('file') }
       }, {
         name: '新建文件夹',
-        handler: () => { this.openNewInput('directory') }
+        handler: () => { this.openCrfeateNew('directory') }
       }, {
         name: 'split-line'
       }, {
@@ -124,43 +119,56 @@ export default class DirectoryItem extends Vue {
       }, {
         name: '复制路径',
         handler: () => { /*  */}
-      }, {
+      }
+    ]
+
+    if (!this.root) {
+      meunItems.push({
         name: 'split-line'
       }, {
         name: '重命名',
-        handler: () => { /*  */}
+        handler: () => {
+          this.nameEditor.startInput()
+        }
       }, {
         name: '删除',
-        handler: () => { /*  */}
-      }
-    ])
+        handler: async () => {
+          try {
+            await MessageBox.confirm(`是否删除文件 ${this.directory.name} ！`, '警告')
+            this.remove()
+          } catch (error) {/*  */}
+        }
+      })
+    }
+
+    this.appEditor.openContextmenu(event, meunItems)
   }
 
-  private openNewInput(type: string) {
-    this.newInfo.type = type
-    this.newInfo.show = true
-    this.newInfo.name = ''
+  private blur () {
+    const newInput = this.$refs.newInput as HTMLInputElement
+    newInput.blur()
+  }
+
+  private openCrfeateNew(type: string) {
+    this.expanded = true
     this.$nextTick(() => {
-      const newInput = this.$refs.newInput as HTMLInputElement
-      newInput.focus()
+      let createNew!: CreateNew
+      if (type === 'directory') {
+        createNew = this.$refs.directoryCreateNew as CreateNew
+      } else {
+        createNew = this.$refs.fileCreateNew as CreateNew
+      }
+      createNew.open()
     })
   }
 
-  private handleCreateNew() {
-    this.newInfo.show = false
-    if (!this.newInfo.name) {
-      return
+  private remove() {
+    const parent = this.$parent as DirectoryItem
+    const directorys = parent.directory.directorys
+    const index = directorys.indexOf(this.directory)
+    if (index >= 0) {
+      directorys.splice(index, 1);
     }
-    if (this.newInfo.type === 'file') {
-      const file = new File()
-      file.name = this.newInfo.name
-      this.directory.files.push(file)
-    } else if (this.newInfo.type === 'directory') {
-      const directory = new Directory()
-      directory.name = this.newInfo.name
-      this.directory.directorys.push(directory)
-    }
-    this.newInfo.name = ''
   }
 }
 </script>
@@ -169,6 +177,11 @@ export default class DirectoryItem extends Vue {
 $folderColor: #90a4ae;
 
 .DirectoryItem {
+  &.root {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
   .directory {
     position: relative;
     height: 26px;
@@ -182,9 +195,9 @@ $folderColor: #90a4ae;
     top: -3px;
     width: 10px;
     height: 10px;
+    margin-top: 6px;
     margin-right: 5px;
     color: rgba(255,255,255,0.5);
-    vertical-align: super;
   }
   .icon {
     display: inline-block;
@@ -192,26 +205,23 @@ $folderColor: #90a4ae;
     top: 0px;
     width: 16px;
     height: 16px;
+    margin-top: 5px;
     margin-right: 8px;
     color: $folderColor;
-    vertical-align: super;
   }
   .name {
     display: inline-block;
-    width: calc(100% - 60px);
+    width: calc(100% - 40px);
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     font-size: 13px;
     color: $text-color;
+    vertical-align: top;
   }
   .new {
     height: 26px;
     line-height: 26px;
-  }
-  .new .icon,
-  .new .arrow-icon {
-    margin-top: 5px;
   }
   .new input {
     vertical-align: top;

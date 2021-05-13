@@ -1,5 +1,4 @@
 import { JsonObject, JsonProperty } from '@/core/json2typescript'
-import FileEditableObject from '../editable-object/file-editable-object/FileEditableObject'
 
 @JsonObject('Directory')
 export default class File {
@@ -10,9 +9,6 @@ export default class File {
   @JsonProperty('content', String, true)
   public content = ''
 
-  public fileEditableObject!: FileEditableObject
-
-  constructor () {
-    this.fileEditableObject = new FileEditableObject(this)
-  }
+  @JsonProperty('base64', String, true)
+  public base64 = ''
 }

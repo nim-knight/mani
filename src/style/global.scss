@@ -34,9 +34,62 @@
 }
 
 /* ElementUI 样式重置 */
+.ApplicationEditor, .mani {
+  .el-button {
+    border-radius: 0px;
+  }
+
+  @mixin button($bg-color) {
+    &,
+    &:focus {
+      background: $bg-color;
+      border-color: $bg-color;
+      color: $text-color;
+    }
+    &:hover {
+      background: lighten($bg-color, 12.5%) !important;
+      border-color: lighten($bg-color, 12.5%) !important;
+    }
+    &:active {
+      background: lighten($bg-color, 7.5%) !important;
+      border-color: lighten($bg-color, 7.5%) !important;
+    }
+  }
+
+  .el-button--default {
+    @include button($button-background)
+  }
+
+  .el-button--default.el-button--primary {
+    @include button($primary-color)
+  }
+  // .el-button--default,
+  // .el-button--default:focus {
+  //   background: $button-background;
+  //   border-color: $button-background;
+  //   color: $text-color;
+  // }
+
+  // .el-button--default:hover {
+  //   background: lighten($button-background, 12.5%) !important;
+  //   border-color: lighten($button-background, 12.5%) !important;
+  // }
+
+  // .el-button--default:active {
+  //   background: lighten($button-background, 7.5%) !important;
+  //   border-color: lighten($button-background, 7.5%) !important;
+  // }
+
+  .el-button.el-button--mini {
+    height: 24px;
+    padding: 0px 10px;
+    line-height: 24px;
+  }
+
+}
 
 /* el-input */
-.ApplicationEditor {
+.ApplicationEditor, .mani {
   .el-input__inner {
     background:$input-background-color;
     color: $text-color-gray;
@@ -71,7 +124,7 @@
 }
 
 /* el-collapse */
-.ApplicationEditor {
+.ApplicationEditor, .mani {
   .el-collapse {
     border: none;
   }
@@ -93,6 +146,18 @@
   }
   .el-collapse-item__content {
     padding: 5px 0 5px 15px;
+    color: $text-color;
+  }
+}
+
+/* el-message-box */
+.ApplicationEditor, .mani {
+  .el-message-box {
+    background: $panel-background-color;
+    border-color: $border-color;
+  }
+  .el-message-box__title,
+  .el-message-box__message {
     color: $text-color;
   }
 }

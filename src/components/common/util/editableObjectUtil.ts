@@ -5,6 +5,7 @@ import FileEditableObject from '@/core/editable-object/file-editable-object/File
 import { VueConstructor } from 'vue'
 import FileEditor from '@/components/application-editor/object-editor/FileEditor.vue'
 import VueFileEditor from '@/components/application-editor/object-editor/VueFileEditor.vue'
+import ImageEditor from '@/components/application-editor/object-editor/ImageEditor.vue'
 
 // eslint-disable-next-line
 type Constructor<T> = new(...args: any[]) => T;
@@ -15,8 +16,6 @@ interface EditableObjectTypeInfo {
   editors: VueConstructor[];
   icon: string[];
   color: string;
-  // eslint-disable-next-line
-  getChildren: (applicationConfig: any) => EditableObject[];
 }
 
 export const editableObjectTypeInfos: EditableObjectTypeInfo[] = [
@@ -26,16 +25,20 @@ export const editableObjectTypeInfos: EditableObjectTypeInfo[] = [
     editors: [VueFileEditor],
     fileSuffix: 'vue',
     icon: ['fab', 'vuejs'],
-    color: '#3fb884',
-    getChildren: applicationConfig => applicationConfig.pageConfigs
-  },
-  {
+    color: '#3fb884'
+  }, {
+    name: 'PNG 文件',
+    constructor: FileEditableObject,
+    editors: [ImageEditor],
+    fileSuffix: 'png',
+    icon: ['far', 'file-image'],
+    color: '#30f8f4'
+  }, {
     name: '文件',
     constructor: FileEditableObject,
     editors: [FileEditor],
     icon: ['far', 'file'],
-    color: '#ff6600',
-    getChildren: applicationConfig => applicationConfig.pageConfigs
+    color: '#ff6600'
   }
 ]
 

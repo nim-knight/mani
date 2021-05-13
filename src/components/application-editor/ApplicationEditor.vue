@@ -36,12 +36,13 @@ import FileExplorer from './tool-panel/file-explorer/FileExplorer.vue'
 import PropertiesConfigPanel from './tool-panel/properties-config-panel/PropertiesConfigPanel.vue'
 import { default as ApplicationEditorMenu, MeunItem} from './ApplicationEditorMenu.vue'
 
-import Project from '@/core/model/Project'
-import Directory from '@/core/model/Directory'
-import File from '@/core/model/File'
+import Project from '@/core/file-model/Project'
+import Directory from '@/core/file-model/Directory'
+import File from '@/core/file-model/File'
 
 import localforage from 'localforage'
 import throttle from 'lodash.throttle'
+import FileEditableObject from '@/core/editable-object/file-editable-object/FileEditableObject'
 
 @Component({
   name: 'ApplicationEditor',
@@ -69,9 +70,7 @@ export default class ApplicationEditor extends Vue {
   /** 当前激活的对象编辑器的KEY */
   public currentEditableObject: EditableObject| null = null
 
-  private layoutRootNode: LayoutNode = defaultLayout
-
-  private get projectFiles() {
+  public get projectFiles() {
     const projectFiles: File[] = []
     const  traverse = (directory: Directory) => {
       if (directory) {
@@ -88,6 +87,22 @@ export default class ApplicationEditor extends Vue {
     }
     return projectFiles
   }
+
+  public get fileEditableObjectMap() {
+    const map = new Map<File, FileEditableObject>()
+
+    for (const file of this.projectFiles) {
+      map.set(file, new FileEditableObject(file))
+    }
+
+    return map
+  }
+
+  public get fileEditableObjects() {
+    return this.fileEditableObjectMap.values()
+  }
+
+  private layoutRootNode: LayoutNode = defaultLayout
 
   public openObjectEditor(
     object: EditableObject,
@@ -163,4 +178,9 @@ $interval: 0px;
 
 <style lang="scss">
 @import '~@/style/global.scss';
+.ApplicationEditor {
+  * {
+    box-sizing: border-box;
+  }
+}
 </style>

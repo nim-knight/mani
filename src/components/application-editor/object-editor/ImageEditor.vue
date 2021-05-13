@@ -1,11 +1,7 @@
 <template>
   <div class="FileEditor">
     <div class="body">
-      <CodeEditor
-        class="code-editor"
-        ref="codeEditor"
-        v-model="content"
-      ></CodeEditor>
+      <img :src="base64Url"/>
     </div>
   </div>
 </template>
@@ -13,10 +9,9 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import TabInfo from '@/components/application-editor/object-editor-tabs/TabInfo';
 import FileEditableObject from '@/core/editable-object/file-editable-object/FileEditableObject';
-import CodeEditor from '@/components/common/code-editor/CodeEditor.vue'
 
 @Component({
-  components: { CodeEditor }
+  components: { }
 })
 export default class FileEditor extends Vue {
   @Prop({ required: true })
@@ -38,6 +33,14 @@ export default class FileEditor extends Vue {
     this.file.content = content
   }
 
+  public get base64() {
+    return this.file.base64
+  }
+  
+  public get base64Url() {
+    return 'data:image/png;base64,' + this.base64
+  }
+
   public get tabInfoKey() {
     const tabInfo = this.tabInfo
     return `${tabInfo.editor.name}:${tabInfo.object.id}`
@@ -52,7 +55,11 @@ export default class FileEditor extends Vue {
   padding: 2px;
   .body {
     height: 100%;
+    line-height: calc(100%);
     background: $panel-background-color-darken;
+    display: flex;
+    align-items:center;
+    justify-content:center;
   }
   .code-editor {
     height: 100%;
